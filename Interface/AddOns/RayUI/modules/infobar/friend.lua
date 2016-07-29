@@ -81,7 +81,6 @@ local function LoadFriend()
 		-- Battle.net Friends
 		for t = 1, BNGetNumFriends() do
 			local presenceID, presenceName, BattleTag, isBattleTagPresence, toonName, toonID, client, isOnline, lastOnline, isAFK, isDND, broadcast, note = BNGetFriendInfo(t)
-
 			-- WoW friends
 			if isOnline then
 				if ( not FriendsTabletData or FriendsTabletData == nil ) then FriendsTabletData = {} end
@@ -122,7 +121,7 @@ local function LoadFriend()
                         )
                     else
                         cname = string.format(
-                            "|cff%02x%02x%02x%s|r |cffcccccc(|r|cff%02x%02x%02x%s|r|cffcccccc)|r",
+                            "|cff%02x%02x%02x%s|r |cffcccccc|r|cff%02x%02x%02x%s|r|cffcccccc|r",
                             FRIENDS_BNET_NAME_COLOR.r * 255, FRIENDS_BNET_NAME_COLOR.g * 255, FRIENDS_BNET_NAME_COLOR.b * 255,
                             presenceName,
                             r * 255, g * 255, b * 255,
@@ -146,6 +145,11 @@ local function LoadFriend()
 					faction = FACTION_ALLIANCE
 				else
                     faction = ""
+                end
+
+                -- Client
+                if client == "Pro" then 
+                	client = "OW"
                 end
 
 				-- Add Friend to list
