@@ -129,6 +129,8 @@ R["Watcher"] = {
                 { spellID = 202737, unitId = "player", caster = "player", filter = "BUFF" },
 				--化身:生命之树
                 { spellID = 117679, unitId = "player", caster = "player", filter = "BUFF" },
+                --裂伤
+                { spellID = 93622, unitId = "player", caster = "player", filter = "BUFF" },
             },
             {
                 name = "目标重要buff&debuff",
@@ -156,7 +158,7 @@ R["Watcher"] = {
                 --斜掠
                 { spellID = 155722, unitId = "target", caster = "player", filter = "DEBUFF" },
                 --痛击
-                { spellID = 77758, unitId = "target", caster = "player", filter = "DEBUFF" },
+                { spellID = 192090, unitId = "target", caster = "player", filter = "DEBUFF" },
 				--痛击（豹）
                 { spellID = 106830, unitId = "target", caster = "player", filter = "DEBUFF" },
 				--星光閃焰
