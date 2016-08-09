@@ -52,7 +52,7 @@
 
    -- Position and size
    local Health = CreateFrame("StatusBar", nil, self)
-   Health:Height(20)
+   Health:SetHeight(20)
    Health:SetPoint('TOP')
    Health:SetPoint('LEFT')
    Health:SetPoint('RIGHT')
@@ -60,7 +60,7 @@
    -- Add a background
    local Background = Health:CreateTexture(nil, 'BACKGROUND')
    Background:SetAllPoints(Health)
-   Background:SetColorTexture(1, 1, 1, .5)
+   Background:SetTexture(1, 1, 1, .5)
    
    -- Options
    Health.frequentUpdates = true
@@ -85,14 +85,13 @@
 ]]
 local parent, ns = ...
 local oUF = ns.oUF
-local updateFrequentUpdates
 
 local isBetaClient = select(4, GetBuildInfo()) >= 70000
 
 oUF.colors.health = {49/255, 207/255, 37/255}
 
 local Update = function(self, event, unit)
-	if(self.unit ~= unit) or not unit then return end
+	if(self.unit ~= unit) then return end
 	local health = self.Health
 
 	if(health.PreUpdate) then health:PreUpdate(unit) end
@@ -108,11 +107,6 @@ local Update = function(self, event, unit)
 	end
 
 	health.disconnected = disconnected
-
-	if health.frequentUpdates ~= health.__frequentUpdates then
-		health.__frequentUpdates = health.frequentUpdates
-		updateFrequentUpdates(self)
-	end
 
 	local r, g, b, t
 	if(health.colorTapping and not UnitPlayerControlled(unit) and
@@ -160,34 +154,17 @@ local ForceUpdate = function(element)
 	return Path(element.__owner, 'ForceUpdate', element.__owner.unit)
 end
 
-function updateFrequentUpdates(self)
-	local health = self.Health
-	if health.frequentUpdates and not self:IsEventRegistered("UNIT_HEALTH_FREQUENT") then
-		if GetCVarBool("predictedHealth") ~= true then
-			SetCVar("predictedHealth", "1")
-		end
-
-		self:RegisterEvent('UNIT_HEALTH_FREQUENT', Path)
-
-		if self:IsEventRegistered("UNIT_HEALTH") then
-			self:UnregisterEvent("UNIT_HEALTH", Path)
-		end
-	elseif not self:IsEventRegistered("UNIT_HEALTH") then
-		self:RegisterEvent('UNIT_HEALTH', Path)
-
-		if self:IsEventRegistered("UNIT_HEALTH_FREQUENT") then
-			self:UnregisterEvent("UNIT_HEALTH_FREQUENT", Path)
-		end	
-	end
-end
-
 local Enable = function(self, unit)
 	local health = self.Health
 	if(health) then
 		health.__owner = self
 		health.ForceUpdate = ForceUpdate
-		health.__frequentUpdates = health.frequentUpdates
-		updateFrequentUpdates(self)
+
+		if(health.frequentUpdates) then
+			self:RegisterEvent('UNIT_HEALTH_FREQUENT', Path)
+		else
+			self:RegisterEvent('UNIT_HEALTH', Path)
+		end
 
 		self:RegisterEvent("UNIT_MAXHEALTH", Path)
 		self:RegisterEvent('UNIT_CONNECTION', Path)
