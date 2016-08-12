@@ -11,6 +11,7 @@ RayUF.colors.power["MANA"] = {0, 0.8, 1}
 
 RayUF["colors"].class = {
 	["DEATHKNIGHT"] = { 0.77,	0.12,		0.23 },
+	["DEMONHUNTER"] = { 0.64,   0.19,      0.79 },
 	["DRUID"]       = { 1,		0.49,		0.04 },
 	["HUNTER"]      = { 0.58,	0.86,		0.49 },
 	["MAGE"]        = { 0.2,	0.76,		1 },
