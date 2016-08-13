@@ -1,21 +1,19 @@
-local parent, ns = ...
-local oUF = ns.oUF
+--[[ Element: Range Fader
 
-local _FRAMES = {}
-local OnRangeFrame
+ Widget
 
-local UnitIsConnected = UnitIsConnected
-local tinsert, tremove, twipe = table.insert, table.remove, table.wipe
+ Range - A table containing opacity values.
 
-local friendlySpells, resSpells, longEnemySpells, enemySpells, petSpells = {}, {}, {}, {}, {}
-local addSpellRetry = {}
+ Options
 
-local SpellRange = LibStub("SpellRange-1.0")
+ .outsideAlpha - Opacity when the unit is out of range. Values 0 (fully
+                 transparent) - 1 (fully opaque).
+ .insideAlpha  - Opacity when the unit is within range. Values 0 (fully
+                 transparent) - 1 (fully opaque).
 
-local function AddSpell(table, spellID)
-	table[#table + 1] = spellID
-end
+ Examples
 
+<<<<<<< HEAD
 local _,class = UnitClass("player")
 do
 	if class == "PRIEST" then
@@ -82,96 +80,25 @@ do
 		AddSpell(longEnemySpells, 204021) -- Fiery Brand (Vengeance) (30 yards)
 	end
 end
+=======
+   -- Register with oUF
+   self.Range = {
+      insideAlpha = 1,
+      outsideAlpha = 1/2,
+   }
+>>>>>>> myrayui
 
-local function getUnit(unit)
-	if not unit:find("party") or not unit:find("raid") then
-		for i=1, 4 do
-			if UnitIsUnit(unit, "party"..i) then
-				return "party"..i
-			end
-		end
+ Hooks
 
-		for i=1, 40 do
-			if UnitIsUnit(unit, "raid"..i) then
-				return "raid"..i
-			end
-		end
-	else
-		return unit
-	end
-end
+]]
 
-local function friendlyIsInRange(unit)	
-	if CheckInteractDistance(unit, 1) and UnitInPhase(unit) then --Inspect (28 yards) and same phase as you
-		return true
-	end
+local parent, ns = ...
+local oUF = ns.oUF
 
-	if UnitIsDeadOrGhost(unit) and #resSpells > 0 then
-		for _, spellID in ipairs(resSpells) do
-			if SpellRange.IsSpellInRange(spellID, unit) == 1 then
-				return true
-			end
-		end
+local _FRAMES = {}
+local OnRangeFrame
 
-		return false
-	end
-
-	if #friendlySpells == 0 and (UnitInRaid(unit) or UnitInParty(unit)) then
-		unit = getUnit(unit)
-		return unit and UnitInRange(unit)
-	else
-		for _, spellID in ipairs(friendlySpells) do
-			if SpellRange.IsSpellInRange(spellID, unit) == 1 then
-				return true
-			end
-		end
-	end
-	
-	return false
-end
-
-local function petIsInRange(unit)
-	if CheckInteractDistance(unit, 2) then
-		return true
-	end
-	
-	for _, spellID in ipairs(friendlySpells) do
-		if SpellRange.IsSpellInRange(spellID, unit) == 1 then
-			return true
-		end
-	end
-	for _, spellID in ipairs(petSpells) do
-		if SpellRange.IsSpellInRange(spellID, unit) == 1 then
-			return true
-		end
-	end
-	
-	return false
-end
-
-local function enemyIsInRange(unit)
-	if CheckInteractDistance(unit, 2) then
-		return true
-	end
-	
-	for _, spellID in ipairs(enemySpells) do
-		if SpellRange.IsSpellInRange(spellID, unit) == 1 then
-			return true
-		end
-	end
-	
-	return false
-end
-
-local function enemyIsInLongRange(unit)
-	for _, spellID in ipairs(longEnemySpells) do
-		if SpellRange.IsSpellInRange(spellID, unit) == 1 then
-			return true
-		end
-	end
-	
-	return false
-end
+local UnitInRange, UnitIsConnected = UnitInRange, UnitIsConnected
 
 -- updating of range.
 local timer = 0
@@ -182,31 +109,37 @@ local OnRangeUpdate = function(self, elapsed)
 		for _, object in next, _FRAMES do
 			if(object:IsShown()) then
 				local range = object.Range
-				local unit = object.unit
-				if(unit) then
-					if UnitCanAttack("player", unit) then
-						if enemyIsInRange(unit) then
-							object:SetAlpha(range.insideAlpha)
-						elseif enemyIsInLongRange(unit) then
-							object:SetAlpha(range.insideAlpha)
-						else
-							object:SetAlpha(range.outsideAlpha)
-						end
-					elseif UnitIsUnit(unit, "pet") then
-						if petIsInRange(unit) then
-							object:SetAlpha(range.insideAlpha)
+				if(UnitIsConnected(object.unit)) then
+					local inRange, checkedRange = UnitInRange(object.unit)
+					if(checkedRange and not inRange) then
+						if(range.Override) then
+							--[[ .Override(self, status)
+
+							 A function used to override the calls to :SetAlpha().
+
+							 Arguments
+
+							 self   - The unit object.
+							 status - The range status of the unit. Either `inside` or
+							          `outside`.
+							]]
+							range.Override(object, 'outside')
 						else
 							object:SetAlpha(range.outsideAlpha)
 						end
 					else
-						if friendlyIsInRange(unit) and UnitIsConnected(unit) then
+						if(range.Override) then
+							range.Override(object, 'inside')
+						elseif(object:GetAlpha() ~= range.insideAlpha) then
 							object:SetAlpha(range.insideAlpha)
-						else
-							object:SetAlpha(range.outsideAlpha)
 						end
 					end
 				else
-					object:SetAlpha(range.insideAlpha)	
+					if(range.Override) then
+						range.Override(object, 'offline')
+					elseif(object:GetAlpha() ~= range.insideAlpha) then
+						object:SetAlpha(range.insideAlpha)
+					end
 				end
 			end
 		end
@@ -218,7 +151,7 @@ end
 local Enable = function(self)
 	local range = self.Range
 	if(range and range.insideAlpha and range.outsideAlpha) then
-		tinsert(_FRAMES, self)
+		table.insert(_FRAMES, self)
 
 		if(not OnRangeFrame) then
 			OnRangeFrame = CreateFrame"Frame"
@@ -236,11 +169,11 @@ local Disable = function(self)
 	if(range) then
 		for k, frame in next, _FRAMES do
 			if(frame == self) then
-				tremove(_FRAMES, k)
-				frame:SetAlpha(1)
+				table.remove(_FRAMES, k)
 				break
 			end
 		end
+		self:SetAlpha(1)
 
 		if(#_FRAMES == 0) then
 			OnRangeFrame:Hide()

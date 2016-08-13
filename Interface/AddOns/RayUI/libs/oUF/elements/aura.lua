@@ -137,13 +137,6 @@ end
 
 local updateIcon = function(unit, icons, index, offset, filter, isDebuff, visible)
 	local name, rank, texture, count, dtype, duration, timeLeft, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff = UnitAura(unit, index, filter)
-	
-	if icons.forceShow then
-		spellID = 47540
-		name, rank, texture = GetSpellInfo(spellID)
-		count, dtype, duration, timeLeft, caster, isStealable, shouldConsolidate, canApplyAura, isBossDebuff = 5, 'Magic', 0, 60, 'player', nil, nil, nil, nil
-	end
-	
 	if(name) then
 		local n = visible + offset + 1
 		local icon = icons[n]
@@ -199,10 +192,7 @@ local updateIcon = function(unit, icons, index, offset, filter, isDebuff, visibl
 		 A boolean value telling the aura element if it should be show the icon
 		 or not.
 		]]
-		local show = true
-		if not icons.forceShow then
-			show = (icons.CustomFilter or customFilter) (icons, unit, icon, name, rank, texture, count, dtype, duration, timeLeft, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff)
-		end
+		local show = (icons.CustomFilter or customFilter) (icons, unit, icon, name, rank, texture, count, dtype, duration, timeLeft, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff)
 		if(show) then
 			-- We might want to consider delaying the creation of an actual cooldown
 			-- object to this point, but I think that will just make things needlessly

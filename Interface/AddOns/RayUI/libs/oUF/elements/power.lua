@@ -71,7 +71,7 @@
    -- Add a background
    local Background = Power:CreateTexture(nil, 'BACKGROUND')
    Background:SetAllPoints(Power)
-   Background:SetColorTexture(1, 1, 1, .5)
+   Background:SetTexture(1, 1, 1, .5)
    
    -- Options
    Power.frequentUpdates = true
@@ -100,7 +100,6 @@ local oUF = ns.oUF
 
 local isBetaClient = select(4, GetBuildInfo()) >= 70000
 
-local updateFrequentUpdates
 oUF.colors.power = {}
 for power, color in next, PowerBarColor do
 	if (type(power) == "string") then
@@ -148,7 +147,6 @@ else
 end
 
 local GetDisplayPower = function(unit)
-	if not unit then return; end
 	local _, min, _, _, _, _, showOnRaid = UnitAlternatePowerInfo(unit)
 	if(showOnRaid) then
 		return ALTERNATE_POWER_INDEX, min
@@ -156,7 +154,7 @@ local GetDisplayPower = function(unit)
 end
 
 local Update = function(self, event, unit)
-	if(self.unit ~= unit) or not unit then return end
+	if(self.unit ~= unit) then return end
 	local power = self.Power
 
 	if(power.PreUpdate) then power:PreUpdate(unit) end
@@ -167,9 +165,6 @@ local Update = function(self, event, unit)
 	end
 	local cur, max = UnitPower(unit, displayType), UnitPowerMax(unit, displayType)
 	local disconnected = not UnitIsConnected(unit)
-	if max == 0 then
-		max = 1
-	end
 	power:SetMinMaxValues(min or 0, max)
 
 	if(disconnected) then
@@ -179,10 +174,6 @@ local Update = function(self, event, unit)
 	end
 
 	power.disconnected = disconnected
-	if power.frequentUpdates ~= power.__frequentUpdates then
-		power.__frequentUpdates = power.frequentUpdates
-		updateFrequentUpdates(self)
-	end
 
 	local r, g, b, t
 	if(power.colorTapping and not UnitPlayerControlled(unit) and
@@ -195,6 +186,7 @@ local Update = function(self, event, unit)
 		t = power.altPowerColor
 	elseif(power.colorPower) then
 		local ptype, ptoken, altR, altG, altB = UnitPowerType(unit)
+
 		t = self.colors.power[ptoken]
 		if(not t) then
 			if(power.GetAlternativeColor) then
@@ -213,7 +205,7 @@ local Update = function(self, event, unit)
 	elseif(power.colorReaction and UnitReaction(unit, 'player')) then
 		t = self.colors.reaction[UnitReaction(unit, "player")]
 	elseif(power.colorSmooth) then
-		local adjust = 0 - (min or 0)
+        local adjust = 0 - (min or 0)
 		r, g, b = self.ColorGradient(cur + adjust, max + adjust, unpack(power.smoothGradient or self.colors.smooth))
 	end
 
@@ -244,31 +236,17 @@ local ForceUpdate = function(element)
 	return Path(element.__owner, 'ForceUpdate', element.__owner.unit)
 end
 
-function updateFrequentUpdates(self)
-	local power = self.Power
-	if power.frequentUpdates and not self:IsEventRegistered('UNIT_POWER_FREQUENT') then
-		self:RegisterEvent('UNIT_POWER_FREQUENT', Path)
-
-		if self:IsEventRegistered('UNIT_POWER') then
-			self:UnregisterEvent('UNIT_POWER', Path)
-		end
-	elseif not self:IsEventRegistered('UNIT_POWER') then
-		self:RegisterEvent('UNIT_POWER', Path)
-
-		if self:IsEventRegistered('UNIT_POWER_FREQUENT') then
-			self:UnregisterEvent('UNIT_POWER_FREQUENT', Path)
-		end		
-	end
-end
-
 local Enable = function(self, unit)
 	local power = self.Power
 	if(power) then
 		power.__owner = self
 		power.ForceUpdate = ForceUpdate
 
-		power.__frequentUpdates = power.frequentUpdates
-		updateFrequentUpdates(self)
+		if(power.frequentUpdates and (unit == 'player' or unit == 'pet')) then
+			self:RegisterEvent('UNIT_POWER_FREQUENT', Path)
+		else
+			self:RegisterEvent('UNIT_POWER', Path)
+		end
 
 		self:RegisterEvent('UNIT_POWER_BAR_SHOW', Path)
 		self:RegisterEvent('UNIT_POWER_BAR_HIDE', Path)

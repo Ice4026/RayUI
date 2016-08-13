@@ -61,6 +61,7 @@ function AB:CreateExtraButton()
 		button.pushed = true
 		button.checked = true
 		
+		-- self:Style(button)
         button:StyleButton(true)
 		button:CreateShadow("Background")
 		button.Cooldown:SetFrameLevel(button:GetFrameLevel()+2)

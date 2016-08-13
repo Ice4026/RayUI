@@ -33,7 +33,6 @@ local parent, ns = ...
 local oUF = ns.oUF
 
 local Update = function(self, event)
-	if not self.unit then return; end
 	local resurrect = self.ResurrectIcon
 	if(resurrect.PreUpdate) then
 		resurrect:PreUpdate()
