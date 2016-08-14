@@ -21,16 +21,10 @@ R["Watcher"] = {
                 setpoint = positions.player_buff_icon,
                 size = 28,
 
-                --生命之花
-                { spellID = 33763, unitId = "player", caster = "player", filter = "BUFF" },
-                --回春術
-                { spellID = 774, unitId = "player", caster = "player", filter = "BUFF" },
-                --癒合
-                { spellID = 8936, unitId = "player", caster = "player", filter = "BUFF" },
+                
                 --共生
                 { spellID = 100977, unitId = "player", caster = "player", filter = "BUFF" },
-                --回春術(萌芽)
-                { spellID = 155777, unitId = "player", caster = "player", filter = "BUFF" },
+                
             },
             {
                 name = "目标buff&debuff",
@@ -38,16 +32,8 @@ R["Watcher"] = {
                 setpoint = positions.target_buff_icon,
                 size = 28,
 
-                --生命之花
-                { spellID = 33763, unitId = "target", caster = "player", filter = "BUFF" },
-                --回春術
-                { spellID = 774, unitId = "target", caster = "player", filter = "BUFF" },
-                --癒合
-                { spellID = 8936, unitId = "target", caster = "player", filter = "BUFF" },
                 --精靈群襲
                 { spellID = 102355, unitId = "target", caster = "all", filter = "DEBUFF" },
-                --回春術(萌芽)
-                { spellID = 155777, unitId = "target", caster = "player", filter = "BUFF" },
             },
             {
                 name = "玩家重要buff&debuff",
@@ -71,6 +57,8 @@ R["Watcher"] = {
                 { spellID = 61336, unitId = "player", caster = "player", filter = "BUFF" },
                 --節能施法
                 { spellID = 135700, unitId = "player", caster = "player", filter = "BUFF" },
+                --Clearcasting (Restoration)
+                { spellID = 16870, unitId = "player", caster = "player", filter = "BUFF" },
                 --樹皮術
                 { spellID = 22812, unitId = "player", caster = "player", filter = "BUFF" },
                 --狂暴
@@ -131,6 +119,16 @@ R["Watcher"] = {
                 { spellID = 117679, unitId = "player", caster = "player", filter = "BUFF" },
                 --裂伤
                 { spellID = 93622, unitId = "player", caster = "player", filter = "BUFF" },
+
+                ----Restoration
+                --生命之花
+                { spellID = 33763, unitId = "player", caster = "player", filter = "BUFF" },
+                --回春術
+                { spellID = 774, unitId = "player", caster = "player", filter = "BUFF" },
+                --癒合
+                { spellID = 8936, unitId = "player", caster = "player", filter = "BUFF" },
+                --回春術(萌芽)
+                { spellID = 155777, unitId = "player", caster = "player", filter = "BUFF" },
             },
             {
                 name = "目标重要buff&debuff",
@@ -163,6 +161,16 @@ R["Watcher"] = {
                 { spellID = 106830, unitId = "target", caster = "player", filter = "DEBUFF" },
 				--星光閃焰
                 { spellID = 202347, unitId = "target", caster = "player", filter = "DEBUFF" },
+
+                ----Restoration
+                --生命之花
+                { spellID = 33763, unitId = "target", caster = "player", filter = "BUFF" },
+                --回春術
+                { spellID = 774, unitId = "target", caster = "player", filter = "BUFF" },
+                --癒合
+                { spellID = 8936, unitId = "target", caster = "player", filter = "BUFF" },
+                --回春術(萌芽)
+                { spellID = 155777, unitId = "target", caster = "player", filter = "BUFF" },
             },
             {
                 name = "焦点buff&debuff",

@@ -89,7 +89,9 @@ function IF:RegisterLDB()
 			local infobar = IF:CreateInfoPanel("RayUI_InfoPanel_"..name, 80)
 			if not lastbar then
 				infobar:SetPoint("LEFT", RayUI_InfoPanel_Guild, "RIGHT", 0, 0)
+				-- infobar:SetPoint("RIGHT", RayUI_InfoPanel_CallToArms, "LEFT", 0, 0)
 			else
+				-- infobar:SetPoint("RIGHT", lastbar, "LEFT", 0, 0)
 				infobar:SetPoint("LEFT", lastbar, "RIGHT", 0, 0)
 			end
 			lastbar = infobar
