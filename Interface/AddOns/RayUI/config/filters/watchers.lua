@@ -253,6 +253,10 @@ R["Watcher"] = {
 
                 --Demon Soul
                 { spellID = 163073, unitId = "player", caster = "player", filter = "BUFF" },
+                --Metamorphosis
+                { spellID = 162264, unitId = "player", caster = "player", filter = "BUFF" },
+                --Blur
+                { spellID = 212800, unitId = "player", caster = "player", filter = "BUFF" },
             },
             {
                 name = "目标重要buff&debuff",
