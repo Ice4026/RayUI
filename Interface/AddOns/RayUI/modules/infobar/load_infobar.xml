@@ -9,7 +9,7 @@
 	<Script file="guild.lua"/>
 	<Script file="currency.lua"/>
 	<Script file="memory.lua"/>
-	<Script file="stat1.lua"/>
-	<Script file="stat2.lua"/>
+	<!-- <Script file="stat1.lua"/> -->
+	<!-- <Script file="stat2.lua"/> -->
 	<Script file="calltoarms.lua"/>
 </Ui>
