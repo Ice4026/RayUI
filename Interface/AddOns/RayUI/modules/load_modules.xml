@@ -17,4 +17,5 @@
 	<Include file="reminder\load_reminder.xml"/>
 	<Include file="notification\load_notification.xml"/>
 	<Include file="misc\load_misc.xml"/>
+	<Include file="skadasetting\load_skadasetting.xml"/>
 </Ui>

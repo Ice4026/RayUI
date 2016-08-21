@@ -7,6 +7,10 @@ IF.InfoBarStatusColor = {{1, 0, 0}, {1, 1, 0}, {0, 0.4, 1}}
 
 local height = 15
 local speed = 135
+local blackList = {
+	["Skada"] = true, 
+	["BugSack"] = true,
+}
 IF.gap = 15
 
 function IF:CreateInfoPanel(name, width)
@@ -84,7 +88,7 @@ end
 function IF:RegisterLDB()
 	local lastbar = nil
 	for name, obj in LDB:DataObjectIterator() do
-		if obj.OnEnter or obj.OnTooltipShow then
+		if not blackList[name] and (obj.OnEnter or obj.OnTooltipShow) then
 			local curFrame = nil
 			local infobar = IF:CreateInfoPanel("RayUI_InfoPanel_"..name, 80)
 			if not lastbar then

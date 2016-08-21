@@ -104,6 +104,9 @@ L["点击隐藏聊天栏"] = true
 L["点击显示聊天栏"] = true
 L["有新的悄悄话"] = true
 
+L["点击隐藏Skada"] = true
+L["点击显示Skada"] = true
+
 L["您背包内的粗糙物品已被自动卖出, 您赚取了"] = true
 L["您的装备已使用公会修理, 花费了"] = true
 L["您的装备已修理, 花费了"] = true
@@ -245,6 +248,11 @@ L["模块"] = true
 	L["|cff7aa6d6Ray|r|cffff0000U|r|cff7aa6d6I|r鼠标提示模块."] = true
 		L["跟随鼠标"] = true
 		L["战斗中隐藏"] = true
+	L["Skada设置"] = true
+  		L["|cff7aa6d6Ray|r|cffff0000U|r|cff7aa6d6I|rSkada设置模块."] = true
+    	L["非战斗时隐藏"] = true
+    	L["Skada自动隐藏时间"] = true
+    	L["设置脱战后多少秒隐藏"] = true
 	L["BUFF"] = true
 	L["冷却提示"] = true
 L["头像"] = true

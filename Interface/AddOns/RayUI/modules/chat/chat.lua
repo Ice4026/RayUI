@@ -272,7 +272,7 @@ function CH:EditBox_MouseOn()
 	end
 end
 
-function  CH:EditBox_MouseOff()
+function CH:EditBox_MouseOff()
 	for i =1, #CHAT_FRAMES do
 		local eb = _G["ChatFrame"..i.."EditBox"]
 		local tab = _G["ChatFrame"..i.."Tab"]

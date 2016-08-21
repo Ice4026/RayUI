@@ -502,6 +502,11 @@ P["Skins"]={
 	numeration = true,
 }
 
+P["SkadaSetting"]={
+	skadahide = true,
+	skadahidetime = 10,
+}
+
 P["Bags"]={
 	bagSize = 35,
 	bankSize = 35,

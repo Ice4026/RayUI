@@ -144,7 +144,7 @@ function CH:AutoHide()
 		self:RegisterEvent("PLAYER_REGEN_DISABLED", "OnEvent")
 	end
 	local ChatToggle = CreateFrame("Frame", "ChatToggle", UIParent)
-	ChatToggle:CreatePanel("Default", 15, 140, "BOTTOMLEFT",UIParent,"BOTTOMLEFT", 0,30)
+	ChatToggle:CreatePanel("Default", 10, 140, "BOTTOMLEFT",UIParent,"BOTTOMLEFT", 0,30)
 	ChatToggle:SetAlpha(0)
 	ChatToggle:SetScript("OnEnter",function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT", 0, 0)
