@@ -21,6 +21,10 @@
  .displayAltPower   - Use this to let the widget display alternate power if the
                       unit has one. If no alternate power the display will fall
                       back to primary power.
+ .useAtlas          - Use this to let the widget use an atlas for its texture if
+                      `.atlas` is defined on the widget or an atlas is present in
+                      `self.colors.power` for the appropriate power type.
+ .atlas             - A custom atlas
 
  The following options are listed by priority. The first check that returns
  true decides the color of the bar.
@@ -67,12 +71,12 @@
    Power:SetPoint('BOTTOM')
    Power:SetPoint('LEFT')
    Power:SetPoint('RIGHT')
-   
+
    -- Add a background
    local Background = Power:CreateTexture(nil, 'BACKGROUND')
    Background:SetAllPoints(Power)
    Background:SetTexture(1, 1, 1, .5)
-   
+
    -- Options
    Power.frequentUpdates = true
    Power.colorTapping = true
@@ -80,10 +84,10 @@
    Power.colorPower = true
    Power.colorClass = true
    Power.colorReaction = true
-   
+
    -- Make the background darker.
    Background.multiplier = .5
-   
+
    -- Register it with oUF
    self.Power = Power
    self.Power.bg = Background
@@ -98,8 +102,6 @@
 local parent, ns = ...
 local oUF = ns.oUF
 
-local isBetaClient = select(4, GetBuildInfo()) >= 70000
-
 oUF.colors.power = {}
 for power, color in next, PowerBarColor do
 	if (type(power) == "string") then
@@ -110,14 +112,9 @@ for power, color in next, PowerBarColor do
 				oUF.colors.power[power][index] = {color.r, color.g, color.b}
 			end
 		else
-			oUF.colors.power[power] = {color.r, color.g, color.b}
+			oUF.colors.power[power] = {color.r, color.g, color.b, atlas = color.atlas}
 		end
 	end
-end
-
-if(isBetaClient) then
-	-- COMBO_POINTS don't have a color pre-Legion so we need to supply that color
-	oUF.colors.power.COMBO_POINTS = {1, 0.96, 0.41}
 end
 
 -- sourced from FrameXML/Constants.lua
@@ -129,22 +126,14 @@ oUF.colors.power[4] = oUF.colors.power.COMBO_POINTS
 oUF.colors.power[5] = oUF.colors.power.RUNES
 oUF.colors.power[6] = oUF.colors.power.RUNIC_POWER
 oUF.colors.power[7] = oUF.colors.power.SOUL_SHARDS
+oUF.colors.power[8] = oUF.colors.power.LUNAR_POWER
 oUF.colors.power[9] = oUF.colors.power.HOLY_POWER
+oUF.colors.power[11] = oUF.colors.power.MAELSTROM
 oUF.colors.power[12] = oUF.colors.power.CHI
-
-if(isBetaClient) then
-	oUF.colors.power[8] = oUF.colors.power.LUNAR_POWER
-	oUF.colors.power[11] = oUF.colors.power.MAELSTROM
-	oUF.colors.power[13] = oUF.colors.power.INSANITY
-	oUF.colors.power[16] = oUF.colors.power.ARCANE_CHARGES
-	oUF.colors.power[17] = oUF.colors.power.FURY
-	oUF.colors.power[18] = oUF.colors.power.PAIN
-else
-	oUF.colors.power[8] = oUF.colors.power.ECLIPSE
-	oUF.colors.power[13] = oUF.colors.power.SHADOW_ORBS
-	oUF.colors.power[14] = oUF.colors.power.BURNING_EMBERS
-	oUF.colors.power[15] = oUF.colors.power.DEMONIC_FURY
-end
+oUF.colors.power[13] = oUF.colors.power.INSANITY
+oUF.colors.power[16] = oUF.colors.power.ARCANE_CHARGES
+oUF.colors.power[17] = oUF.colors.power.FURY
+oUF.colors.power[18] = oUF.colors.power.PAIN
 
 local GetDisplayPower = function(unit)
 	local _, min, _, _, _, _, showOnRaid = UnitAlternatePowerInfo(unit)
@@ -165,6 +154,7 @@ local Update = function(self, event, unit)
 	end
 	local cur, max = UnitPower(unit, displayType), UnitPowerMax(unit, displayType)
 	local disconnected = not UnitIsConnected(unit)
+	local tapped = not UnitPlayerControlled(unit) and UnitIsTapDenied(unit)
 	power:SetMinMaxValues(min or 0, max)
 
 	if(disconnected) then
@@ -174,25 +164,29 @@ local Update = function(self, event, unit)
 	end
 
 	power.disconnected = disconnected
+	power.tapped = tapped
 
+	local ptype, ptoken, altR, altG, altB = UnitPowerType(unit)
 	local r, g, b, t
-	if(power.colorTapping and not UnitPlayerControlled(unit) and
-		(isBetaClient and UnitIsTapDenied(unit) or not isBetaClient and UnitIsTapped(unit) and
-		not UnitIsTappedByPlayer(unit) and not UnitIsTappedByAllThreatList(unit))) then
+
+	if(power.colorTapping and not UnitPlayerControlled(unit) and UnitIsTapDenied(unit)) then
 		t = self.colors.tapped
 	elseif(power.colorDisconnected and disconnected) then
 		t = self.colors.disconnected
 	elseif(displayType == ALTERNATE_POWER_INDEX and power.altPowerColor) then
 		t = power.altPowerColor
 	elseif(power.colorPower) then
-		local ptype, ptoken, altR, altG, altB = UnitPowerType(unit)
-
 		t = self.colors.power[ptoken]
 		if(not t) then
 			if(power.GetAlternativeColor) then
 				r, g, b = power:GetAlternativeColor(unit, ptype, ptoken, altR, altG, altB)
 			elseif(altR) then
-				r, g, b = altR, altG, altB
+				-- As of 7.0.3, altR, altG, altB may be in 0-1 or 0-255 range.
+				if(altR > 1) or (altG > 1) or (altB > 1) then
+					r, g, b = altR / 255, altG / 255, altB / 255
+				else
+					r, g, b = altR, altG, altB
+				end
 			else
 				t = self.colors.power[ptype]
 			end
@@ -205,7 +199,7 @@ local Update = function(self, event, unit)
 	elseif(power.colorReaction and UnitReaction(unit, 'player')) then
 		t = self.colors.reaction[UnitReaction(unit, "player")]
 	elseif(power.colorSmooth) then
-        local adjust = 0 - (min or 0)
+		local adjust = 0 - (min or 0)
 		r, g, b = self.ColorGradient(cur + adjust, max + adjust, unpack(power.smoothGradient or self.colors.smooth))
 	end
 
@@ -213,18 +207,33 @@ local Update = function(self, event, unit)
 		r, g, b = t[1], t[2], t[3]
 	end
 
-	if(b) then
-		power:SetStatusBarColor(r, g, b)
-
-		local bg = power.bg
-		if(bg) then
-			local mu = bg.multiplier or 1
-			bg:SetVertexColor(r * mu, g * mu, b * mu)
+	t = self.colors.power[ptoken or ptype]
+	local atlas = power.atlas or (t and t.atlas)
+	if(power.useAtlas and atlas and displayType ~= ALTERNATE_POWER_INDEX) then
+		power:SetStatusBarAtlas(atlas)
+		power:SetStatusBarColor(1, 1, 1)
+		if(power.colorTapping or power.colorDisconnected) then
+			t = disconnected and self.colors.disconnected or self.colors.tapped
+			power:GetStatusBarTexture():SetDesaturated(disconnected or tapped)
+		end
+		if(t and b) then
+			r, g, b = t[1], t[2], t[3]
+		end
+	else
+		power:SetStatusBarTexture(power.texture)
+		if(b) then
+			power:SetStatusBarColor(r, g, b)
 		end
 	end
 
+	local bg = power.bg
+	if(bg and b) then
+		local mu = bg.multiplier or 1
+		bg:SetVertexColor(r * mu, g * mu, b * mu)
+	end
+
 	if(power.PostUpdate) then
-		return power:PostUpdate(unit, cur, max, min)
+		return power:PostUpdate(unit, cur, max, min, ptoken, ptype)
 	end
 end
 
@@ -257,8 +266,9 @@ local Enable = function(self, unit)
 		-- For tapping.
 		self:RegisterEvent('UNIT_FACTION', Path)
 
-		if(power:IsObjectType'StatusBar' and not power:GetStatusBarTexture()) then
-			power:SetStatusBarTexture[[Interface\TargetingFrame\UI-StatusBar]]
+		if(power:IsObjectType'StatusBar') then
+			power.texture = power:GetStatusBarTexture() and power:GetStatusBarTexture():GetTexture() or [[Interface\TargetingFrame\UI-StatusBar]]
+			power:SetStatusBarTexture(power.texture)
 		end
 
 		return true

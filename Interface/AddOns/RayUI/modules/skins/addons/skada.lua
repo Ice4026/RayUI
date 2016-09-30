@@ -7,7 +7,7 @@ local function SkinSkada()
 	local Skada = Skada
 	local barSpacing = R:Scale(0)
 	local bars = 8
-    local windowWidth = 280
+    local windowWidth = 400
 
 	Skada.classcolors = R.colors.class
 
@@ -100,6 +100,8 @@ local function SkinSkada()
 		skada:SetBackdrop(nil)
 		if not skada.shadow then
 			skada:CreateShadow("Background")
+		else
+			skada.shadow:SetFrameLevel(3) -- Fix Skada-1.5-8 shadow issue
 		end
 		skada.border:ClearAllPoints()
 		if win.db.enabletitle then
